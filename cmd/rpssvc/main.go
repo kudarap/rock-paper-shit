@@ -48,7 +48,7 @@ func (a *App) Setup() error {
 		return fmt.Errorf("could not setup redis: %s", err)
 	}
 
-	svc := rockpapershit.NewService(postgresClient, a.logger)
+	svc := rockpapershit.NewService(postgresClient, redisClient, a.logger)
 	service := telemetry.TraceFooService(svc, a.logger)
 
 	auth := &server.JWTAuth{NoVerify: true}
@@ -59,6 +59,15 @@ func (a *App) Setup() error {
 	a.worker = worker.New(fj, a.config.WorkerQueueSize, a.logger)
 	a.worker.Use(worker.LoggingMiddleware(a.logger), telemetry.TraceWorker)
 	a.worker.HandleFunc("demo", worker.FakeFighterConsumer(a.logger))
+
+	mm := &worker.Matchmaker{
+		Redis:   redisClient,
+		Service: svc,
+		Logger:  a.logger,
+	}
+
+	// run match making worker.
+	go mm.Run()
 
 	a.closerFn = func() error {
 		if err = postgresClient.Close(); err != nil {
