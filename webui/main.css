@@ -25,7 +25,7 @@ h1 {
     font-size: larger;
 }
 .player-container div .player-id {
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: bolder;
 }
 
@@ -52,16 +52,38 @@ h1 {
 .cast-container {
     margin: 80px auto;
     display: flex;
+    justify-content: space-evenly;
 }
 .cast-container button {
     height: 80px;
-    width: 150px;
+    width: 120px;
     margin: 0 auto;
     font-size: larger;
 }
+.cast-container button:hover {
+    cursor: pointer;
+}
+
+.result-container {
+    margin: 80px auto;
+    display: flex;
+    justify-content: space-between;
+}
+.result-container button {
+    height: 80px;
+    width: 120px;
+    margin: 0 auto;
+    font-size: larger;
+    background-color: lightblue;
+    border: 1px solid grey;
+    border-radius: 10px;
+}
+.result-container button:hover {
+    cursor: pointer;
+}
 
 .welcome-container {
-    font-size: 1.5em;
+    font-size: 1.2em;
     display: flex;
     justify-content: space-between;
     margin-bottom: 80px;
@@ -75,6 +97,8 @@ h1 {
     font-weight: bolder;
 }
 
-.spacer {
-    display: flex;
+h2#timer {
+    text-align: center;
+    font-size: 4em;
+    margin-top: -20px;
 }
