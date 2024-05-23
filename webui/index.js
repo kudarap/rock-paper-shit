@@ -1,24 +1,22 @@
 import idgen from './idgen.js'
 import api from './api.js'
-
-const LOCAL_PLAEYR_ID_KEY = 'rps_player_id'
+import local from './local.js'
 
 function main() {
-    let playerID = window.localStorage.getItem(LOCAL_PLAEYR_ID_KEY)
-    if (!playerID) {
-        alert('Hi Welcome! we will be generating name for you!')
+    let playerID = local.getPlayer()
+    console.log(playerID)
 
+    if (!playerID) {
         playerID = idgen()
         api.createPlayer(playerID).then((player) => {
             console.log(player)
             document.getElementById('player_text_id').innerText = player.id
             document.getElementById('player_text_ranking').innerText = player.ranking
-            window.localStorage.setItem(LOCAL_PLAEYR_ID_KEY, playerID)
+            local.setPlayer(player.id)
         }).catch(e => {
             alert('Ooops! curse of demos :)')
             console.error(e.message)
         })
-
         return
     }
 
@@ -33,3 +31,8 @@ function main() {
 }
 
 main()
+
+// emulate 
+// setTimeout(() => {
+//     window.location = '/game#912j0921ke09jk'
+// }, 3000)
