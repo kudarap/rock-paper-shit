@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
-	rockpapershit "github.com/kudarap/foo"
+	rockpapershit "github.com/kudarap/rockpapershit"
 )
 
 func (c *Client) Games(ctx context.Context) (*[]rockpapershit.Game, error) {

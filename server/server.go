@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 // Server represents application server.
@@ -69,6 +70,7 @@ func (s *Server) Routes() http.Handler {
 	r.Use(
 		s.tracing.Middleware(),
 		requestIDMiddleware,
+		cors.Handler(cors.Options{}),
 		s.loggingMiddleware,
 		s.recoveryMiddleware,
 	)

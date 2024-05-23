@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/kudarap/foo"
+	"github.com/kudarap/rockpapershit"
 )
 
 type game interface {
