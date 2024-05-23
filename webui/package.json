@@ -1,0 +1,22 @@
+{
+  "name": "webui",
+  "version": "1.0.0",
+  "description": "rock-paper-shit ui",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "serve"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^14.2.3",
+    "unique-username-generator": "^1.3.0"
+  },
+  "browser": {
+    "path": false
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.3"
+  }
+}
