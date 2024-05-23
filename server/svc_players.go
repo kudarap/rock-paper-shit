@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	rockpapershit "github.com/kudarap/foo"
+	rockpapershit "github.com/kudarap/rockpapershit"
 )
 
 type players interface {

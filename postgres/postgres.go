@@ -13,12 +13,18 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/kudarap/rockpapershit"
 )
 
 // Client represents postgres database client.
 type Client struct {
 	db     *pgxpool.Pool
 	logger *slog.Logger
+}
+
+func (c *Client) Player(ctx context.Context, playerID string) (*rockpapershit.Player, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 // NewClient creates new instance of postgres client.

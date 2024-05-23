@@ -1,9 +1,8 @@
-
-const API_URL = 'http://localhost:3000'
+const API_URL = 'http://localhost:8000'
 
 async function createPlayer(playerID) {
-    const res = await fetch(API_URL + '/mockapi/postplayer.json', {
-        method: 'POST',
+    const res = await fetch(API_URL + '/version', {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -14,7 +13,6 @@ async function createPlayer(playerID) {
     const player = await res.json();
     return player
 }
-
 
 export default {
     createPlayer
