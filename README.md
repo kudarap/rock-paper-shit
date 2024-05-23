@@ -1,5 +1,5 @@
-# Foo Service
-golang backend service scaffold
+# Rock-Paper-Shit
+A roshambo game with online matchmaking. 
 
 ### Features
 - [x] API server
