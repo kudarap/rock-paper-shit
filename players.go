@@ -1,10 +1,10 @@
 package rockpapershit
 
 type Player struct {
-	ID         string
-	Ranking    int
-	Wins       int
-	Loses      int
-	Draws      int
-	PlaysCount int
+	ID         string `json:"id"`
+	Ranking    int    `json:"ranking"`
+	Wins       int    `json:"wins"`
+	Loses      int    `json:"loses"`
+	Draws      int    `json:"draws"`
+	PlaysCount int    `json:"plays_count"`
 }

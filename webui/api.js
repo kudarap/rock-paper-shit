@@ -1,11 +1,15 @@
 const API_URL = 'http://localhost:8000'
 
+const apiOpts = {
+    headers: {
+        'Content-Type': 'application/json',
+    },
+}
+
 async function createPlayer(playerID) {
-    const res = await fetch(API_URL + '/version', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    const res = await fetch(API_URL + '/players', {
+        method: 'POST',
+        ...apiOpts,
         body: JSON.stringify({
             id: playerID
         }),
@@ -14,6 +18,16 @@ async function createPlayer(playerID) {
     return player
 }
 
+async function getPlayer(playerID) {
+    const res = await fetch(API_URL + '/players/' + playerID, {
+        method: 'GET',
+        ...apiOpts,
+    });
+    const player = await res.json();
+    return player
+}
+
 export default {
-    createPlayer
+    createPlayer,
+    getPlayer,
 }
