@@ -4,10 +4,11 @@ import (
 	"errors"
 	"os"
 
-	"github.com/kudarap/foo/logging"
-	"github.com/kudarap/foo/postgres"
-	"github.com/kudarap/foo/server"
-	"github.com/kudarap/foo/telemetry"
+	"github.com/kudarap/rockpapershit/logging"
+	"github.com/kudarap/rockpapershit/postgres"
+	"github.com/kudarap/rockpapershit/redis"
+	"github.com/kudarap/rockpapershit/server"
+	"github.com/kudarap/rockpapershit/telemetry"
 	"github.com/spf13/viper"
 )
 
@@ -21,6 +22,7 @@ type Config struct {
 	Telemetry                    telemetry.Config
 	GoogleApplicationCredentials string
 	Postgres                     postgres.Config
+	Redis                        redis.Config
 }
 
 // Load loads config from environment variables and file.
@@ -53,6 +55,9 @@ func Load(file string) (*Config, error) {
 			MaxConns:        viper.GetInt("POSTGRES_MAX_CONNS"),
 			MaxConnIdleTime: viper.GetDuration("POSTGRES_MAX_IDLE_TIME"),
 			MaxConnLifetime: viper.GetDuration("POSTGRES_MAX_LIFE_TIME"),
+		},
+		Redis: redis.Config{
+			Addr: viper.GetString("REDIS_ADDR"),
 		},
 		GoogleApplicationCredentials: viper.GetString("GOOGLE_APPLICATION_CREDENTIALS"),
 	}

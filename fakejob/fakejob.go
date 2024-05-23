@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/kudarap/foo/worker"
+	"github.com/kudarap/rockpapershit/worker"
 )
 
 type Job struct {

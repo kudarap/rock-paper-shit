@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/kudarap/foo/xerror"
+	"github.com/kudarap/rockpapershit/xerror"
 )
 
 const contentType = "application/json; charset=utf-8"

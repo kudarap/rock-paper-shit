@@ -24,4 +24,5 @@ build:
 	CGO_ENABLED=0 go build -v -ldflags=$(LDFLAGS) ./cmd/$(APPNAME)
 
 local-dbs:
+	docker run --rm --name foo-redis -d 6379:6379 redis:7.2
 	docker run --rm --name foo-postgres -d -v "$(PWD)/.localdata/postgres":/var/lib/postgresql/data -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pass -p 5432:5432 postgres:16.2

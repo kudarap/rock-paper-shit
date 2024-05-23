@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/kudarap/foo"
+	"github.com/kudarap/rockpapershit"
 )
 
 func TestService_FighterByID(t *testing.T) {

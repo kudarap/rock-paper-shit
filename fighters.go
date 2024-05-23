@@ -2,7 +2,7 @@ package rockpapershit
 
 import (
 	guuid "github.com/google/uuid"
-	"github.com/kudarap/foo/xerror"
+	"github.com/kudarap/rockpapershit/xerror"
 )
 
 var ErrFighterNotFound = xerror.Error("not_found")

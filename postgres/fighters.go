@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	rockpapershit "github.com/kudarap/foo"
+	rockpapershit "github.com/kudarap/rockpapershit"
 )
 
 func (c *Client) Fighter(ctx context.Context, id uuid.UUID) (*rockpapershit.Fighter, error) {

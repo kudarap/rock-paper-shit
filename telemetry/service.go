@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/kudarap/foo"
+	"github.com/kudarap/rockpapershit"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 )

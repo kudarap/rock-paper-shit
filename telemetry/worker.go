@@ -3,7 +3,7 @@ package telemetry
 import (
 	"context"
 
-	"github.com/kudarap/foo/worker"
+	"github.com/kudarap/rockpapershit/worker"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"

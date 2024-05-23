@@ -12,14 +12,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kudarap/foo"
-	"github.com/kudarap/foo/config"
-	"github.com/kudarap/foo/fakejob"
-	"github.com/kudarap/foo/logging"
-	"github.com/kudarap/foo/postgres"
-	"github.com/kudarap/foo/server"
-	"github.com/kudarap/foo/telemetry"
-	"github.com/kudarap/foo/worker"
+	"github.com/kudarap/rockpapershit"
+	"github.com/kudarap/rockpapershit/config"
+	"github.com/kudarap/rockpapershit/fakejob"
+	"github.com/kudarap/rockpapershit/logging"
+	"github.com/kudarap/rockpapershit/postgres"
+	"github.com/kudarap/rockpapershit/redis"
+	"github.com/kudarap/rockpapershit/server"
+	"github.com/kudarap/rockpapershit/telemetry"
+	"github.com/kudarap/rockpapershit/worker"
 )
 
 const (
@@ -42,6 +43,11 @@ func (a *App) Setup() error {
 		return fmt.Errorf("could not setup postgres: %s", err)
 	}
 
+	redisClient, err := redis.NewClient(a.config.Redis, a.logger)
+	if err != nil {
+		return fmt.Errorf("could not setup redis: %s", err)
+	}
+
 	svc := rockpapershit.NewService(postgresClient, a.logger)
 	service := telemetry.TraceFooService(svc, a.logger)
 
@@ -58,8 +64,8 @@ func (a *App) Setup() error {
 		if err = postgresClient.Close(); err != nil {
 			return fmt.Errorf("could not close postgres: %s", err)
 		}
-		if err = a.server.Close(); err != nil {
-			return fmt.Errorf("could not close server: %s", err)
+		if err = redisClient.Close(); err != nil {
+			return fmt.Errorf("could not close redis: %s", err)
 		}
 		return nil
 	}

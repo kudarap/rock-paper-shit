@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/kudarap/foo"
+	"github.com/kudarap/rockpapershit"
 )
 
 type service interface {
