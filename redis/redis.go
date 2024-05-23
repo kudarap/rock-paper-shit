@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -16,6 +15,7 @@ type Client struct {
 
 	config Config
 	logger *slog.Logger
+	queue  map[string]int
 }
 
 // NewClient create new instance of redis client.
@@ -24,6 +24,7 @@ func NewClient(conf Config, logger *slog.Logger) (*Client, error) {
 		Addr: conf.Addr,
 	})
 	c := &Client{Client: rc, config: conf, logger: logger}
+	c.queue = make(map[string]int)
 	if _, err := c.Ping(); err != nil {
 		return nil, err
 	}
@@ -51,12 +52,16 @@ type Config struct {
 	Addr string
 }
 
-func (c *Client) FindMatch(ctx context.Context, playerID uuid.UUID) error {
-	err := c.LPush(ctx, "matchmaking_queue", playerID.String()).Err()
-	if err != nil {
-		c.logger.DebugContext(ctx, "error pushing player to matchmaking queue", err)
-		return err
-	}
-	c.logger.InfoContext(ctx, "player successfully added to matchmaking queue", playerID.String())
+func (c *Client) FindMatch(ctx context.Context, playerID string) error {
+	//err := c.LPush(ctx, "matchmaking_queue", playerID).Err()
+	//if err != nil {
+	//	c.logger.DebugContext(ctx, "error pushing player to matchmaking queue", err)
+	//	return err
+	//}
+	//
+	//c.logger.InfoContext(ctx, "player successfully added to matchmaking queue", playerID)
+	//return nil
+
+	// add to queue
 	return nil
 }

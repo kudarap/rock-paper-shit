@@ -17,12 +17,11 @@ import (
 type Server struct {
 	*http.Server
 
-	service            service
-	matchmakingService matchmakingService
-	authenticator      authenticator
-	databaseChecker    databaseChecker
-	tracing            tracing
-	logger             *slog.Logger
+	service         service
+	authenticator   authenticator
+	databaseChecker databaseChecker
+	tracing         tracing
+	logger          *slog.Logger
 
 	config  Config
 	Version Version
@@ -32,7 +31,6 @@ type Server struct {
 func New(
 	config Config,
 	service service,
-	matchmakingService matchmakingService,
 	authenticator authenticator,
 	databaseChecker databaseChecker,
 	tracing tracing,
@@ -50,13 +48,12 @@ func New(
 	)
 
 	s := &Server{
-		service:            service,
-		matchmakingService: matchmakingService,
-		authenticator:      authenticator,
-		databaseChecker:    databaseChecker,
-		tracing:            tracing,
-		Version:            version,
-		logger:             l,
+		service:         service,
+		authenticator:   authenticator,
+		databaseChecker: databaseChecker,
+		tracing:         tracing,
+		Version:         version,
+		logger:          l,
 	}
 	s.Server = &http.Server{
 		Addr:         c.Addr,
@@ -92,7 +89,7 @@ func (s *Server) Routes() http.Handler {
 	r.Get("/games", ListGames(s.service))
 	r.Get("/currentgame", CurrentGame(s.service))
 
-	r.Get("/ws/findmatch", FindMatch(s.matchmakingService))
+	r.Get("/ws/findmatch", FindMatch(s.service))
 
 	// Private endpoints
 	r.Route("/", func(r chi.Router) {

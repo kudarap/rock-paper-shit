@@ -14,6 +14,7 @@ type service interface {
 	CreateGame(ctx context.Context, game *rockpapershit.Game) error
 	GetGame(ctx context.Context, id string) (*rockpapershit.Game, error)
 	Cast(ctx context.Context, throw, playerID string) (*rockpapershit.Game, error)
+	QueuePlayer(ctx context.Context, id string) error
 }
 
 func GetFighterByID(s service) http.HandlerFunc {
