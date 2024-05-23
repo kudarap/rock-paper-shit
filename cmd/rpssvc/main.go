@@ -48,12 +48,12 @@ func (a *App) Setup() error {
 		return fmt.Errorf("could not setup redis: %s", err)
 	}
 
-	svc := rockpapershit.NewService(postgresClient, redisClient, a.logger)
+	svc := rockpapershit.NewService(postgresClient, redisClient, redisClient, a.logger)
 	service := telemetry.TraceFooService(svc, a.logger)
 
 	auth := &server.JWTAuth{NoVerify: true}
 	tsi := telemetry.NewServerInstrumentation(a.config.Telemetry.ServiceName)
-	a.server = server.New(a.config.Server, service, auth, postgresClient, tsi, a.version, a.logger)
+	a.server = server.New(a.config.Server, service, redisClient, auth, postgresClient, tsi, a.version, a.logger)
 
 	fj := fakejob.New(time.Second)
 	a.worker = worker.New(fj, a.config.WorkerQueueSize, a.logger)

@@ -48,22 +48,27 @@ func (m *Matchmaker) Run() {
 			continue
 		}
 
-		// player2ID, err := uuid.Parse(p2)
-		_, err = uuid.Parse(p2)
+		player2ID, err := uuid.Parse(p2)
 		if err != nil {
 			m.Logger.DebugContext(ctx, "error parsing opponent ID", err)
 			continue
 		}
 
-		// TODO: create game.
-		/*gameID := uuid.New()
-		err = m.Service.CreateGame(player1ID, player2ID)
+		gameID := uuid.New()
+		game := rockpapershit.Game{
+			ID:        gameID.String(),
+			PlayerID1: player1ID.String(),
+			PlayerID2: player2ID.String(),
+			CreatedAt: time.Time{},
+		}
+
+		err = m.Service.CreateGame(ctx, &game)
 		if err != nil {
 			m.Logger.DebugContext(ctx, "error creating match", err)
 		} else {
 			m.Logger.InfoContext(ctx, "match created between player", "player1", player1ID, "player2", player2ID)
 			m.notifyPlayers(ctx, player1ID, player2ID, gameID)
-		}*/
+		}
 	}
 }
 

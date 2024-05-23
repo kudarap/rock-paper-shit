@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -48,4 +49,14 @@ func (c *Client) Close() error {
 // Config represents the redis configuration
 type Config struct {
 	Addr string
+}
+
+func (c *Client) FindMatch(ctx context.Context, playerID uuid.UUID) error {
+	err := c.LPush(ctx, "matchmaking_queue", playerID.String()).Err()
+	if err != nil {
+		c.logger.DebugContext(ctx, "error pushing player to matchmaking queue", err)
+		return err
+	}
+	c.logger.InfoContext(ctx, "player successfully added to matchmaking queue", playerID.String())
+	return nil
 }
