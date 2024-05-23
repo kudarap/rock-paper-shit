@@ -1,4 +1,4 @@
-package foo_test
+package rockpapershit_test
 
 import (
 	"context"
@@ -19,22 +19,22 @@ func TestService_FighterByID(t *testing.T) {
 		// params
 		fighterUUID string
 		// returns
-		want    *foo.Fighter
+		want    *rockpapershit.Fighter
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 		{
 			"place-holder-test",
 			&mockFighterRepo{
-				FighterFn: func(ctx context.Context, id uuid.UUID) (*foo.Fighter, error) {
-					return &foo.Fighter{
+				FighterFn: func(ctx context.Context, id uuid.UUID) (*rockpapershit.Fighter, error) {
+					return &rockpapershit.Fighter{
 						ID:        uuid.MustParse("b41c7709-04e3-4c48-b233-34e6838d9140"),
 						FirstName: "justine",
 						LastName:  "jimenez",
 					}, nil
 				}},
 			"b41c7709-04e3-4c48-b233-34e6838d9140",
-			&foo.Fighter{
+			&rockpapershit.Fighter{
 				ID:        uuid.MustParse("b41c7709-04e3-4c48-b233-34e6838d9140"),
 				FirstName: "justine",
 				LastName:  "jimenez",
@@ -48,7 +48,7 @@ func TestService_FighterByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			l := slog.New(slog.NewTextHandler(os.Stdout, nil))
-			svc := foo.NewService(tt.repo, l)
+			svc := rockpapershit.NewService(tt.repo, l)
 			ctx := context.Background()
 			got, err := svc.FighterByID(ctx, tt.fighterUUID)
 			if (err != nil) != tt.wantErr {
@@ -63,9 +63,9 @@ func TestService_FighterByID(t *testing.T) {
 }
 
 type mockFighterRepo struct {
-	FighterFn func(ctx context.Context, id uuid.UUID) (*foo.Fighter, error)
+	FighterFn func(ctx context.Context, id uuid.UUID) (*rockpapershit.Fighter, error)
 }
 
-func (m *mockFighterRepo) Fighter(ctx context.Context, id uuid.UUID) (*foo.Fighter, error) {
+func (m *mockFighterRepo) Fighter(ctx context.Context, id uuid.UUID) (*rockpapershit.Fighter, error) {
 	return m.FighterFn(ctx, id)
 }

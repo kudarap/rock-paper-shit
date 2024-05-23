@@ -12,12 +12,12 @@ import (
 const serviceName = "fooservice"
 
 type FooService struct {
-	*foo.Service
+	*rockpapershit.Service
 	logger     *slog.Logger
 	tracerName string
 }
 
-func (s *FooService) FighterByID(ctx context.Context, id string) (*foo.Fighter, error) {
+func (s *FooService) FighterByID(ctx context.Context, id string) (*rockpapershit.Fighter, error) {
 	ctx, span := otel.Tracer(s.tracerName).Start(ctx, "fooservice.FighterByID")
 	defer span.End()
 
@@ -34,6 +34,6 @@ func (s *FooService) FighterByID(ctx context.Context, id string) (*foo.Fighter, 
 	return f, nil
 }
 
-func TraceFooService(s *foo.Service, l *slog.Logger) *FooService {
+func TraceFooService(s *rockpapershit.Service, l *slog.Logger) *FooService {
 	return &FooService{s, l, serviceName}
 }

@@ -42,7 +42,7 @@ func (a *App) Setup() error {
 		return fmt.Errorf("could not setup postgres: %s", err)
 	}
 
-	svc := foo.NewService(postgresClient, a.logger)
+	svc := rockpapershit.NewService(postgresClient, a.logger)
 	service := telemetry.TraceFooService(svc, a.logger)
 
 	auth := &server.JWTAuth{NoVerify: true}

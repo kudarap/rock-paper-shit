@@ -9,7 +9,7 @@ import (
 )
 
 type service interface {
-	FighterByID(ctx context.Context, id string) (*foo.Fighter, error)
+	FighterByID(ctx context.Context, id string) (*rockpapershit.Fighter, error)
 }
 
 func GetFighterByID(s service) http.HandlerFunc {

@@ -1,4 +1,4 @@
-package foo
+package rockpapershit
 
 import (
 	guuid "github.com/google/uuid"
