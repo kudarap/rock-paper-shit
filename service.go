@@ -7,17 +7,19 @@ import (
 	"log/slog"
 
 	"github.com/google/uuid"
+	"github.com/kudarap/rockpapershit/redis"
 )
 
 // Service represents foo service.
 type Service struct {
 	repo   repository
+	redis  *redis.Client
 	logger *slog.Logger
 }
 
 // NewService returns new foo service.
-func NewService(r repository, l *slog.Logger) *Service {
-	return &Service{repo: r, logger: l}
+func NewService(r repository, redis *redis.Client, l *slog.Logger) *Service {
+	return &Service{repo: r, redis: redis, logger: l}
 }
 
 // ListGames returns a list of games
@@ -121,6 +123,16 @@ func (s *Service) FighterByID(ctx context.Context, sid string) (*Fighter, error)
 		return nil, fmt.Errorf("could not find fighter on repository: %s", err)
 	}
 	return f, nil
+}
+
+func (s *Service) FindMatch(ctx context.Context, playerID uuid.UUID) error {
+	err := s.redis.LPush(ctx, "matchmaking_queue", playerID.String()).Err()
+	if err != nil {
+		s.logger.DebugContext(ctx, "error pushing player to matchmaking queue", err)
+		return err
+	}
+	s.logger.InfoContext(ctx, "player successfully added to matchmaking queue", playerID.String())
+	return nil
 }
 
 // repository manages storage operation for fighters.
