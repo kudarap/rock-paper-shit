@@ -80,6 +80,14 @@ func (s *Server) Routes() http.Handler {
 	r.Get("/healthcheck", HealthCheck(s.databaseChecker))
 	r.Get("/fighters/{id}", GetFighterByID(s.service))
 
+	// Demo endpoints
+	r.Get("/players/{id}", GetPlayerByID(s.service))
+	r.Post("/players", PostPlayer(s.service))
+	r.Get("/players", ListPlayers(s.service))
+
+	r.Get("/games/{id}", GetGameByID(s.service))
+	r.Get("/games", ListGames(s.service))
+
 	// Private endpoints
 	r.Route("/", func(r chi.Router) {
 		r.Use(authMiddleware(s.authenticator))
