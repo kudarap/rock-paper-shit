@@ -20,5 +20,5 @@
 
 # project files
 /.env
-/foosvc
+/rpssvc
 .localdata
