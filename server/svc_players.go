@@ -31,20 +31,18 @@ func GetPlayerByID(s service) http.HandlerFunc {
 
 func PostPlayer(s service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var input rockpapershit.Player
-		if err := decodeJSONReq(r, &input); err != nil {
+		var player rockpapershit.Player
+		if err := decodeJSONReq(r, &player); err != nil {
 			encodeJSONResp(w, err, http.StatusBadRequest)
 			return
 		}
 
-		encodeJSONResp(w, rockpapershit.Player{
-			ID:         input.ID,
-			Ranking:    100,
-			Wins:       3,
-			Loses:      2,
-			Draws:      1,
-			PlaysCount: 6,
-		}, http.StatusCreated)
+		if err := s.CreatePlayer(r.Context(), &player); err != nil {
+			encodeJSONResp(w, err, http.StatusBadRequest)
+			return
+		}
+
+		encodeJSONResp(w, player, http.StatusCreated)
 	}
 }
 

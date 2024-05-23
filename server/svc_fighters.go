@@ -13,7 +13,8 @@ type service interface {
 	ListGames(ctx context.Context, playerID string) ([]rockpapershit.Game, error)
 	CreateGame(ctx context.Context, game *rockpapershit.Game) error
 	GetGame(ctx context.Context, id string) (*rockpapershit.Game, error)
-	Cast(ctx context.Context, throw, playerID string) (*rockpapershit.Game, error)
+	Cast(ctx context.Context, playerID string) (*rockpapershit.Game, error)
+	CreatePlayer(ctx context.Context, player *rockpapershit.Player) error
 }
 
 func GetFighterByID(s service) http.HandlerFunc {
