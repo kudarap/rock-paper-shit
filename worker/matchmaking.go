@@ -21,7 +21,19 @@ type Matchmaker struct {
 func (m *Matchmaker) Run() {
 	m.Logger.Info("matchmaking worker is now running...")
 	ctx := context.Background()
+	for {
+		time.Sleep(5 * time.Second)
+		if err := m.Service.FindMatch(ctx); err != nil {
+			m.Logger.ErrorContext(ctx, err.Error())
+		}
+	}
+}
 
+const listKey = "matchmaking_queue_test"
+
+func (m *Matchmaker) Run1() {
+	m.Logger.Info("matchmaking worker is now running...")
+	ctx := context.Background()
 	for {
 		p1, err := m.Redis.BRPop(ctx, 0, "matchmaking_queue").Result()
 		if err != nil {

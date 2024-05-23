@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,11 +20,51 @@ type Service struct {
 	cache  cache
 	redis  *redis.Client
 	logger *slog.Logger
+
+	queue map[string]int
 }
 
 // NewService returns new foo service.
 func NewService(r repository, c cache, redis *redis.Client, l *slog.Logger) *Service {
-	return &Service{repo: r, cache: c, redis: redis, logger: l}
+	return &Service{repo: r, cache: c, redis: redis, logger: l, queue: make(map[string]int)}
+}
+
+func (s *Service) QueuePlayer(ctx context.Context, id string) error {
+	p, err := s.repo.Player(ctx, id)
+	if err != nil {
+		return err
+	}
+	s.queue[p.ID] = p.Ranking
+	return nil
+}
+
+func (s *Service) FindMatch(ctx context.Context) error {
+	players := make([]string, 0, len(s.queue))
+	for k := range s.queue {
+		players = append(players, k)
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(players)))
+
+	if (len(players) % 2) != 0 {
+		players = players[:len(players)-1]
+	}
+
+	var pairs [][2]string
+	for i := 0; i < len(players)/2; i++ {
+		x := i * 2
+		pairs = append(pairs, [2]string{players[x], players[x+1]})
+	}
+
+	for _, pair := range pairs {
+		g := Game{
+			PlayerID1: pair[0],
+			PlayerID2: pair[1],
+		}
+		if err := s.CreateGame(ctx, &g); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ListGames returns a list of games
@@ -194,5 +235,5 @@ type repository interface {
 }
 
 type cache interface {
-	FindMatch(ctx context.Context, playerID uuid.UUID) error
+	FindMatch(ctx context.Context, playerID string) error
 }
