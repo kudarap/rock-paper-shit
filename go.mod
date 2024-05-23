@@ -4,11 +4,11 @@ go 1.22
 
 require (
 	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/cors v1.2.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.4
-	github.com/kudarap/foo v0.0.0-20240307161802-6c90d3c438ac
 	github.com/kudarap/opentelemetry-logs-go v0.3.1
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/viper v1.18.2
@@ -28,7 +28,6 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

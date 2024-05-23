@@ -3,10 +3,9 @@ package server
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
-	rockpapershit "github.com/kudarap/rockpapershit"
+	"github.com/kudarap/rockpapershit"
 )
 
 type players interface {
@@ -49,27 +48,7 @@ func PostPlayer(s service) http.HandlerFunc {
 	}
 }
 
-func GetGameByID(s service) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		encodeJSONResp(w, rockpapershit.Game{
-			ID:          id,
-			PlayerID1:   "KinagatNgDragon",
-			PlayerID2:   "LumpiangKidlat",
-			PlayerCast1: "",
-			PlayerCast2: "",
-			CreatedAt:   time.Now(),
-		}, http.StatusCreated)
-	}
-}
-
 func ListPlayers(s service) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-	}
-}
-
-func ListGames(s service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 	}

@@ -85,7 +85,7 @@ func (s *Server) Routes() http.Handler {
 	r.Post("/players", PostPlayer(s.service))
 	r.Get("/players", ListPlayers(s.service))
 
-	r.Get("/games/{id}", GetGameByID(s.service))
+	r.Get("/games/{id}", JoinGame(s.service))
 	r.Get("/games", ListGames(s.service))
 
 	// Private endpoints

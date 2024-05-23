@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -21,9 +22,8 @@ func NewService(r repository, l *slog.Logger) *Service {
 }
 
 // ListGames returns a list of games
-func (s *Service) ListGames(ctx context.Context) (*[]Game, error) {
+func (s *Service) ListGames(ctx context.Context) ([]Game, error) {
 	s.logger.InfoContext(ctx, "listing all games")
-
 	g, err := s.repo.Games(ctx)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
@@ -31,36 +31,44 @@ func (s *Service) ListGames(ctx context.Context) (*[]Game, error) {
 		}
 		return nil, fmt.Errorf("could not list games on repository: %s", err)
 	}
+
+	for k, v := range g {
+		g[k] = v.setResult()
+	}
 	return g, nil
 }
 
 // CreateGame creates a game and returns the game details
-func (s *Service) CreateGame(ctx context.Context) (*Game, error) {
+func (s *Service) CreateGame(ctx context.Context, game *Game) error {
 	s.logger.InfoContext(ctx, "create game")
-	g, err := s.repo.CreateGame(ctx)
+	game.CreatedAt = time.Now()
+	err := s.repo.CreateGame(ctx, game)
 	if err != nil {
-		return nil, fmt.Errorf("could not create game: %s", err)
+		return fmt.Errorf("could not create game: %s", err)
 	}
 
-	return g, nil
+	return nil
 }
 
 // JoinGame joins/reconnects to a game and returns the game details
 func (s *Service) JoinGame(ctx context.Context, id string) (*Game, error) {
 	s.logger.InfoContext(ctx, "getting game by id", "id", id)
 
-	p, err := s.repo.Game(ctx, id)
+	g, err := s.repo.Game(ctx, id)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, ErrNotFound.X(err)
 		}
 		return nil, fmt.Errorf("could not find game on repository: %s", err)
 	}
-	return p, nil
+	g1 := g.setResult()
+	return &g1, nil
 }
 
 // Cast updates player_cast and returns game details
-func (s *Service) Cast(ctx context.Context, id string) (*Game, error) {
+func (s *Service) Cast(ctx context.Context, playerID string) (*Game, error) {
+	s.logger.InfoContext(ctx, "cast vote", "id", playerID)
+
 	return nil, nil
 }
 
@@ -126,9 +134,10 @@ func (s *Service) FighterByID(ctx context.Context, sid string) (*Fighter, error)
 // repository manages storage operation for fighters.
 type repository interface {
 	Fighter(ctx context.Context, id uuid.UUID) (*Fighter, error)
-	CreateGame(ctx context.Context) (*Game, error)
-	Games(ctx context.Context) (*[]Game, error)
+	CreateGame(ctx context.Context, game *Game) error
+	Games(ctx context.Context) ([]Game, error)
 	Game(ctx context.Context, gameID string) (*Game, error)
 	Players(ctx context.Context) (*[]Player, error)
 	Player(ctx context.Context, playerID string) (*Player, error)
+	Cast(ctx context.Context, throw string, player int) (*Game, error)
 }
