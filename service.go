@@ -11,6 +11,8 @@ import (
 	"github.com/kudarap/rockpapershit/redis"
 )
 
+const GameTimeOut = 5 * time.Second
+
 // Service represents foo service.
 type Service struct {
 	repo   repository
@@ -25,17 +27,20 @@ func NewService(r repository, c cache, redis *redis.Client, l *slog.Logger) *Ser
 }
 
 // ListGames returns a list of games
-func (s *Service) ListGames(ctx context.Context) ([]Game, error) {
+func (s *Service) ListGames(ctx context.Context, playerID string) ([]Game, error) {
 	s.logger.InfoContext(ctx, "listing all games")
-	g, err := s.repo.Games(ctx)
+	g, err := s.repo.Games(ctx, playerID)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, ErrNotFound.X(err)
 		}
 		return nil, fmt.Errorf("could not list games on repository: %s", err)
 	}
-
+	current := time.Now()
 	for k, v := range g {
+		if playerID != "" && v.CreatedAt.Add(GameTimeOut).After(current) {
+			continue
+		}
 		g[k] = v.setResult()
 	}
 	return g, nil
@@ -53,8 +58,8 @@ func (s *Service) CreateGame(ctx context.Context, game *Game) error {
 	return nil
 }
 
-// JoinGame joins/reconnects to a game and returns the game details
-func (s *Service) JoinGame(ctx context.Context, id string) (*Game, error) {
+// GetGame joins/reconnects to a game and returns the game details
+func (s *Service) GetGame(ctx context.Context, id string) (*Game, error) {
 	s.logger.InfoContext(ctx, "getting game by id", "id", id)
 
 	g, err := s.repo.Game(ctx, id)
@@ -69,10 +74,42 @@ func (s *Service) JoinGame(ctx context.Context, id string) (*Game, error) {
 }
 
 // Cast updates player_cast and returns game details
-func (s *Service) Cast(ctx context.Context, playerID string) (*Game, error) {
+func (s *Service) Cast(ctx context.Context, throw, playerID string) (*Game, error) {
 	s.logger.InfoContext(ctx, "cast vote", "id", playerID)
 
-	return nil, nil
+	//get game by id
+	game, err := s.GetGame(ctx, playerID)
+	if err != nil {
+		return nil, err
+	}
+	var playerN string
+	if game.Winner == game.PlayerID1 {
+		playerN = "player_cast_1"
+	} else {
+		playerN = "player_cast_2"
+	}
+
+	game, err = s.repo.Cast(ctx, throw, playerN, game.ID)
+	if err != nil {
+		return nil, fmt.Errorf("player could not cast: %s", err)
+	}
+
+	// check if game completed player then eval ranking
+	if game.setResult().Winner != "" {
+		winner, err := s.GetPlayerByID(ctx, game.Winner)
+		if err != nil {
+			return nil, err
+		}
+		s.repo.CalcRanking(ctx, game.Winner, winner.Ranking+10)
+
+		loser, err := s.GetPlayerByID(ctx, game.loser())
+		if err != nil {
+			return nil, err
+		}
+		s.repo.CalcRanking(ctx, game.loser(), loser.Ranking-10)
+	}
+
+	return game, nil
 }
 
 // CreatePlayer creates a player and returns player details
@@ -138,11 +175,12 @@ func (s *Service) FighterByID(ctx context.Context, sid string) (*Fighter, error)
 type repository interface {
 	Fighter(ctx context.Context, id uuid.UUID) (*Fighter, error)
 	CreateGame(ctx context.Context, game *Game) error
-	Games(ctx context.Context) ([]Game, error)
+	Games(ctx context.Context, playerID string) ([]Game, error)
 	Game(ctx context.Context, gameID string) (*Game, error)
+	Cast(ctx context.Context, throw, playerN, gameID string) (*Game, error)
+	CalcRanking(ctx context.Context, winner string, mmr int)
 	Players(ctx context.Context) (*[]Player, error)
 	Player(ctx context.Context, playerID string) (*Player, error)
-	Cast(ctx context.Context, throw string, player int) (*Game, error)
 }
 
 type cache interface {
