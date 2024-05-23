@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/kudarap/rockpapershit"
 	"github.com/kudarap/rockpapershit/redis"
 	r "github.com/redis/go-redis/v9"
@@ -14,11 +14,12 @@ import (
 
 type Matchmaker struct {
 	Redis   *redis.Client
-	Service *rockpapershit.Service
+	Service *rockpapershit.Service // game service
 	Logger  *slog.Logger
 }
 
 func (m *Matchmaker) Run() {
+	m.Logger.Info("matchmaking worker is now running...")
 	ctx := context.Background()
 
 	for {
@@ -28,18 +29,18 @@ func (m *Matchmaker) Run() {
 			continue
 		}
 
-		p1ID, err := strconv.Atoi(p1[1])
+		player1ID, err := uuid.Parse(p1[1])
 		if err != nil {
 			m.Logger.DebugContext(ctx, "error parsing player ID", err)
 			continue
 		}
 
-		time.Sleep(5 * time.Second)
+		time.Sleep(5 * time.Second) // 5 seconds delay
 
 		p2, err := m.Redis.RPop(ctx, "matchmaking_queue").Result()
 		if err != nil {
 			if errors.Is(err, r.Nil) {
-				m.Redis.LPush(ctx, "matchmaking_queue", p1ID)
+				m.Redis.LPush(ctx, "matchmaking_queue", player1ID)
 				continue
 			}
 
@@ -47,18 +48,26 @@ func (m *Matchmaker) Run() {
 			continue
 		}
 
-		_, err = strconv.Atoi(p2)
+		// player2ID, err := uuid.Parse(p2)
+		_, err = uuid.Parse(p2)
 		if err != nil {
 			m.Logger.DebugContext(ctx, "error parsing opponent ID", err)
 			continue
 		}
 
 		// TODO: create game.
-		/*err = m.service.CreateGame((uint(p1ID), uint(p2ID))
+		/*gameID := uuid.New()
+		err = m.Service.CreateGame(player1ID, player2ID)
 		if err != nil {
 			m.Logger.DebugContext(ctx, "error creating match", err)
 		} else {
-			m.Logger.InfoContext(ctx, "match created between player", "player1", p1ID, "player2", p2)
+			m.Logger.InfoContext(ctx, "match created between player", "player1", player1ID, "player2", player2ID)
+			m.notifyPlayers(ctx, player1ID, player2ID, gameID)
 		}*/
 	}
+}
+
+func (m *Matchmaker) notifyPlayers(ctx context.Context, p1Id, p2Id, gameId uuid.UUID) {
+	m.Redis.Publish(ctx, "matchmaking_notifications", p1Id.String()+":"+gameId.String())
+	m.Redis.Publish(ctx, "matchmaking_notifications", p2Id.String()+":"+gameId.String())
 }
