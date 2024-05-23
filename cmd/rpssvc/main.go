@@ -60,6 +60,15 @@ func (a *App) Setup() error {
 	a.worker.Use(worker.LoggingMiddleware(a.logger), telemetry.TraceWorker)
 	a.worker.HandleFunc("demo", worker.FakeFighterConsumer(a.logger))
 
+	mm := &worker.Matchmaker{
+		Redis:   redisClient,
+		Service: svc,
+		Logger:  a.logger,
+	}
+
+	// run match making worker.
+	go mm.Run()
+
 	a.closerFn = func() error {
 		if err = postgresClient.Close(); err != nil {
 			return fmt.Errorf("could not close postgres: %s", err)
