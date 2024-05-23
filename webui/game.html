@@ -8,30 +8,35 @@
 </head>
 <body>
     <div id="container">
+        <div id="game_id"></div>
         <h1>Rock-Paper-Shit</h1>
-        
+        <h2 id="timer">10s</h2>
         <div class="player-container">
             <div style="text-align: left;">You:<br />
-                <span id="player1_text_id" class="player-id">KinagatNgDragon</span><br />
-                <span id="player1_text_ranking">100<small>mmr</small></span>
+                <span id="player1_text_id" class="player-id">Player1</span><br />
+                <span id="player1_text_ranking">
+                    100<small>mmr</small>
+                </span>
             </div>
-            <div style="text-align: right;">Player: <br />
-                <span id="player2_text_id" class="player-id">LumpiangKidlat</span><br />
-                
-                <span id="player2_text_ranking">100<small>mmr</small></span>
+            <div style="text-align: right;">Enemy: <br />
+                <span id="player2_text_id" class="player-id">Player2</span><br />
+                <span id="player2_text_ranking">
+                    100<small>mmr</small>
+                </span>
             </div>
         </div>
-
         <div class="cast-container">
-            <button>Rock</button>
-            <button>Paper</button>
-            <button>Shit</button>
+            <div><button id="cast_rock">ROCK</button></div>
+            <div><button id="cast_paper">PAPER</button></div>
+            <div><button id="cast_shit">SHIT</button></div>
         </div>
+        <div class="result-container" style="display: none;"></div>
 
-        <div class="menu-container">
+        <div class="menu-container" style="display: none;">
             <button>Find Match</button>
         </div>
+        <p style="text-align: center;"><a href="/">quit</a></p>
     </div>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="game.js"></script>
 </body>
 </html>

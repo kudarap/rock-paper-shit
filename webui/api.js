@@ -14,8 +14,7 @@ async function createPlayer(playerID) {
             id: playerID
         }),
     });
-    const player = await res.json();
-    return player
+    return await res.json();
 }
 
 async function getPlayer(playerID) {
@@ -23,11 +22,20 @@ async function getPlayer(playerID) {
         method: 'GET',
         ...apiOpts,
     });
-    const player = await res.json();
-    return player
+    return await res.json();
 }
+
+async function getGame(gameID) {
+    const res = await fetch(API_URL + '/games/' + gameID, {
+        method: 'GET',
+        ...apiOpts,
+    });
+    return await res.json();
+}
+
 
 export default {
     createPlayer,
     getPlayer,
+    getGame,
 }
