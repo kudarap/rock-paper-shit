@@ -74,7 +74,7 @@ func (s *Service) GetGame(ctx context.Context, id string) (*Game, error) {
 }
 
 // Cast updates player_cast and returns game details
-func (s *Service) Cast(ctx context.Context, throw, playerID string) (*Game, error) {
+func (s *Service) Cast(ctx context.Context, playerID string) (*Game, error) {
 	s.logger.InfoContext(ctx, "cast vote", "id", playerID)
 
 	//get game by id
@@ -83,10 +83,13 @@ func (s *Service) Cast(ctx context.Context, throw, playerID string) (*Game, erro
 		return nil, err
 	}
 	var playerN string
+	var throw string
 	if game.Winner == game.PlayerID1 {
 		playerN = "player_cast_1"
+		throw = game.PlayerCast1
 	} else {
 		playerN = "player_cast_2"
+		throw = game.PlayerCast2
 	}
 
 	game, err = s.repo.Cast(ctx, throw, playerN, game.ID)
@@ -113,8 +116,13 @@ func (s *Service) Cast(ctx context.Context, throw, playerID string) (*Game, erro
 }
 
 // CreatePlayer creates a player and returns player details
-func (s *Service) CreatePlayer(ctx context.Context) (*Player, error) {
-	return nil, nil
+func (s *Service) CreatePlayer(ctx context.Context, player *Player) error {
+	s.logger.InfoContext(ctx, "create a player")
+
+	if err := s.repo.CreatePlayer(ctx, player); err != nil {
+		return fmt.Errorf("could not create player: %s", err)
+	}
+	return nil
 }
 
 // ListPlayers returns a list of players
@@ -181,6 +189,8 @@ type repository interface {
 	CalcRanking(ctx context.Context, winner string, mmr int)
 	Players(ctx context.Context) (*[]Player, error)
 	Player(ctx context.Context, playerID string) (*Player, error)
+
+	CreatePlayer(ctx context.Context, player *Player) error
 }
 
 type cache interface {

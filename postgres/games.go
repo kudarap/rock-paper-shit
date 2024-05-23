@@ -80,11 +80,3 @@ func (c *Client) Cast(ctx context.Context, throw, playerN, gameID string) (*rock
 	}
 	return nil, nil
 }
-
-func (c *Client) CalcRanking(ctx context.Context, player string, mmr int) {
-	sqlStatement := fmt.Sprintf(`Update players SET ranking = $1 where id = $2`, mmr, player)
-	_, err := c.db.Query(ctx, sqlStatement)
-	if err != nil {
-		fmt.Errorf(`error calculating rank: %v`, err)
-	}
-}
