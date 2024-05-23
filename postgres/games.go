@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/kudarap/rockpapershit"
@@ -18,8 +19,20 @@ func (c *Client) CreateGame(ctx context.Context, game *rockpapershit.Game) error
 	return nil
 }
 
-func (c *Client) Games(ctx context.Context) ([]rockpapershit.Game, error) {
-	rows, err := c.db.Query(ctx, `SELECT id, player_id_1, player_id_2, player_cast_1, player_cast_2, created_at FROM games`)
+const (
+	withFilter    = `SELECT id, player_id_1, player_id_2, player_cast_1, player_cast_2, created_at where player_id_1 = $1 OR player_id_2 =$1 FROM games`
+	withoutFilter = `SELECT id, player_id_1, player_id_2, player_cast_1, player_cast_2, created_at  FROM games`
+)
+
+func (c *Client) Games(ctx context.Context, playerID string) ([]rockpapershit.Game, error) {
+	q := withoutFilter
+	var args []interface{}
+	if playerID != "" {
+		q = withFilter
+		args = append(args, playerID)
+	}
+
+	rows, err := c.db.Query(ctx, q, args...)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, rockpapershit.ErrNotFound
@@ -57,13 +70,21 @@ func (c *Client) Game(ctx context.Context, id string) (*rockpapershit.Game, erro
 	return &game, nil
 }
 
-func (c *Client) Cast(ctx context.Context, throw string, player int) (*rockpapershit.Game, error) {
-	//playerCast := fmt.Sprintf(`player_cast_%d`, player)
-	//sqlStatement := fmt.Sprintf(`Update games SET player_cast_1, = $1 where player_id_1 = $2`, throw, throw)
-	//var createdGame rockpapershit.Game
-	//err := c.db.QueryRow(ctx, sqlStatement, game.ID, game.PlayerID1, game.PlayerID2, game.CreatedAt).Scan(&createdGame)
-	//if err != nil {
-	//
-	//}
+func (c *Client) Cast(ctx context.Context, throw, playerN, gameID string) (*rockpapershit.Game, error) {
+	sqlStatement := fmt.Sprintf(`Update games SET %s = $1 where id = $2`, playerN)
+
+	var createdGame rockpapershit.Game
+	err := c.db.QueryRow(ctx, sqlStatement, throw, gameID).Scan(&createdGame)
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
+}
+
+func (c *Client) CalcRanking(ctx context.Context, player string, mmr int) {
+	sqlStatement := fmt.Sprintf(`Update players SET ranking = $1 where id = $2`, mmr, player)
+	_, err := c.db.Query(ctx, sqlStatement)
+	if err != nil {
+		fmt.Errorf(`error calculating rank: %v`, err)
+	}
 }

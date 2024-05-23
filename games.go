@@ -21,6 +21,16 @@ const (
 	ThrowShit  = "shit"
 )
 
+func (g Game) loser() string {
+	if g.IsDraw {
+		return ""
+	}
+	if g.Winner != g.PlayerID1 {
+		return g.PlayerID1
+	}
+	return g.PlayerID2
+}
+
 func (g Game) setResult() Game {
 	if g.PlayerCast1 != "" && g.PlayerCast2 == "" {
 		g.Winner = g.PlayerID1
