@@ -1,0 +1,80 @@
+body {
+  background-color: white;
+}
+
+h1 {
+  font-size: 3em;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+#container {
+    margin: 10px auto;
+    padding: 10px;
+    max-width: 600px;
+    border: 1px solid lightblue;
+}
+
+.player-container {
+    margin: 10px auto 50px;
+    display: flex;
+    justify-content: space-between;
+}
+.player-container div {
+    display: block;
+    font-size: larger;
+}
+.player-container div .player-id {
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+
+.menu-container {
+    margin: 10px auto;
+    display: flex;
+}
+.menu-container button {
+    height: 80px;
+    width: 200px;
+    background-color: green;
+    border-radius: 10px;
+    border: none;
+    margin: 0 auto;
+    color: white;
+    font-size: larger;
+    display: inline-block;
+}
+.menu-container button:hover {
+    cursor: pointer;
+    background-color: rgb(0, 81, 0);
+}
+
+.cast-container {
+    margin: 80px auto;
+    display: flex;
+}
+.cast-container button {
+    height: 80px;
+    width: 150px;
+    margin: 0 auto;
+    font-size: larger;
+}
+
+.welcome-container {
+    font-size: 1.5em;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 80px;
+}
+.welcome-container #player_text_id {
+    font-size: larger;
+    font-weight: bolder;
+}
+.welcome-container #player_text_rank {
+    font-size: larger;
+    font-weight: bolder;
+}
+
+.spacer {
+    display: flex;
+}
