@@ -26,17 +26,23 @@ func (s *Service) ListGames(ctx context.Context) (*[]Game, error) {
 
 	g, err := s.repo.Games(ctx)
 	if err != nil {
-		if errors.Is(err, ErrFighterNotFound) {
-			return nil, ErrFighterNotFound.X(err)
+		if errors.Is(err, ErrNotFound) {
+			return nil, ErrNotFound.X(err)
 		}
-		return nil, fmt.Errorf("could not find players on repository: %s", err)
+		return nil, fmt.Errorf("could not list games on repository: %s", err)
 	}
 	return g, nil
 }
 
-// CreateGame creates a game by id and returns the game details
-func (s *Service) CreateGame(ctx context.Context, id string) (*Game, error) {
-	return nil, nil
+// CreateGame creates a game and returns the game details
+func (s *Service) CreateGame(ctx context.Context) (*Game, error) {
+	s.logger.InfoContext(ctx, "create game")
+	g, err := s.repo.CreateGame(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not create game: %s", err)
+	}
+
+	return g, nil
 }
 
 // JoinGame joins/reconnects to a game and returns the game details
@@ -45,8 +51,8 @@ func (s *Service) JoinGame(ctx context.Context, id string) (*Game, error) {
 
 	p, err := s.repo.Game(ctx, id)
 	if err != nil {
-		if errors.Is(err, ErrFighterNotFound) {
-			return nil, ErrFighterNotFound.X(err)
+		if errors.Is(err, ErrNotFound) {
+			return nil, ErrNotFound.X(err)
 		}
 		return nil, fmt.Errorf("could not find game on repository: %s", err)
 	}
@@ -69,16 +75,17 @@ func (s *Service) ListPlayers(ctx context.Context) (*[]Player, error) {
 
 	p, err := s.repo.Players(ctx)
 	if err != nil {
-		if errors.Is(err, ErrFighterNotFound) {
-			return nil, ErrFighterNotFound.X(err)
+		if errors.Is(err, ErrNotFound) {
+			return nil, ErrNotFound.X(err)
 		}
-		return nil, fmt.Errorf("could not find players on repository: %s", err)
+		return nil, fmt.Errorf("could not list players on repository: %s", err)
 	}
 	return p, nil
 }
 
 // UpdateRanking calculates ranking and returns player details
 func (s *Service) UpdateRanking(ctx context.Context, id string) (*Player, error) {
+
 	return nil, nil
 }
 
@@ -88,8 +95,8 @@ func (s *Service) GetPlayerByID(ctx context.Context, id string) (*Player, error)
 
 	p, err := s.repo.Player(ctx, id)
 	if err != nil {
-		if errors.Is(err, ErrFighterNotFound) {
-			return nil, ErrFighterNotFound.X(err)
+		if errors.Is(err, ErrNotFound) {
+			return nil, ErrNotFound.X(err)
 		}
 		return nil, fmt.Errorf("could not find player on repository: %s", err)
 	}
@@ -119,6 +126,7 @@ func (s *Service) FighterByID(ctx context.Context, sid string) (*Fighter, error)
 // repository manages storage operation for fighters.
 type repository interface {
 	Fighter(ctx context.Context, id uuid.UUID) (*Fighter, error)
+	CreateGame(ctx context.Context) (*Game, error)
 	Games(ctx context.Context) (*[]Game, error)
 	Game(ctx context.Context, gameID string) (*Game, error)
 	Players(ctx context.Context) (*[]Player, error)

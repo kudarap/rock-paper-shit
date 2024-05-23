@@ -12,3 +12,7 @@ type Game struct {
 	PlayerCast2 string    `json:"player_cast_2"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+
+type GameRequest struct {
+	Game
+}

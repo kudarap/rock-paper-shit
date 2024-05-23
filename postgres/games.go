@@ -5,14 +5,25 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
-	rockpapershit "github.com/kudarap/rockpapershit"
+	"github.com/kudarap/rockpapershit"
 )
+
+func (c *Client) CreateGame(ctx context.Context, game *rockpapershit.Game) (*rockpapershit.Game, error) {
+	sqlStatement := `INSERT INTO games (id, player_id_1, player_id_2, created_at) VALUES ($1, $2, $3) returning id, player_id_1, player_id_2, created_at`
+	var createdGame rockpapershit.Game
+	err := c.db.QueryRow(ctx, sqlStatement, game.ID, game.PlayerID1, game.PlayerID2, game.CreatedAt).Scan(&createdGame)
+	if err != nil {
+		return nil, err
+	}
+
+	return &createdGame, nil
+}
 
 func (c *Client) Games(ctx context.Context) (*[]rockpapershit.Game, error) {
 	rows, err := c.db.Query(ctx, `SELECT id, player_id_1, player_id_2, player_1_cast, player_2_cast, created_at FROM games`)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, rockpapershit.ErrFighterNotFound
+			return nil, rockpapershit.ErrNotFound
 		}
 		return nil, err
 	}
@@ -39,7 +50,7 @@ func (c *Client) Game(ctx context.Context, id string) (*rockpapershit.Game, erro
 		Scan(&game.ID, &game.PlayerID1, &game.PlayerID2, &game.PlayerCast1, &game.PlayerCast2, &game.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, rockpapershit.ErrFighterNotFound
+			return nil, rockpapershit.ErrNotFound
 		}
 		return nil, err
 	}
