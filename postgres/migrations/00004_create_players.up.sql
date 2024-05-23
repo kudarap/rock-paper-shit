@@ -1,6 +1,9 @@
 CREATE TABLE players (
-    id serial,
-    first_name text,
-    last_name text,
+    id varchar,
+    ranking integer,
+    wins integer,
+    loses integer,
+    draws integer,
+    plays_count integer,
     PRIMARY KEY(id)
 );

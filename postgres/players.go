@@ -9,6 +9,22 @@ import (
 	"github.com/kudarap/rockpapershit"
 )
 
+func (c *Client) Player(ctx context.Context, playerID string) (*rockpapershit.Player, error) {
+	var player rockpapershit.Player
+	player.ID = playerID
+	err := c.db.
+		QueryRow(ctx, `SELECT id, ranking, wins, loses, draws, plays_count FROM players WHERE id=$1`, playerID).
+		Scan(&player.ID, &player.Ranking, &player.Wins, &player.Loses, &player.Draws, &player.PlaysCount)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, rockpapershit.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return &player, nil
+}
+
 func (c *Client) Players(ctx context.Context) (*[]rockpapershit.Player, error) {
 	rows, err := c.db.Query(ctx, `SELECT id, ranking, wins, loses, draws, plays_count FROM players`)
 	if err != nil {
@@ -34,12 +50,11 @@ func (c *Client) Players(ctx context.Context) (*[]rockpapershit.Player, error) {
 }
 
 func (c *Client) CreatePlayer(ctx context.Context, player *rockpapershit.Player) error {
-	sqlStatement := `INSERT INTO players (id, ranking, wins, loses, draws, plays_count) VALUES ($1, $2, $3, $4, $5, $6) returning id, ranking, wins, loses, draws, plays_count`
-	err := c.db.QueryRow(ctx, sqlStatement, player.ID, player.Ranking, player.Wins, player.Draws, player.PlaysCount).Scan(player)
+	sqlStatement := `INSERT INTO players (id, ranking, wins, loses, draws, plays_count) VALUES ($1, $2, $3, $4, $5, $6) `
+	_, err := c.db.Exec(ctx, sqlStatement, player.ID, player.Ranking, player.Wins, player.Loses, player.Draws, player.PlaysCount)
 	if err != nil {
 		return err
 	}
-
 	return nil
 
 }

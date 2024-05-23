@@ -10,12 +10,14 @@ import (
 )
 
 func (c *Client) CreateGame(ctx context.Context, game *rockpapershit.Game) error {
-	sqlStatement := `INSERT INTO games (id, player_id_1, player_id_2, created_at) VALUES ($1, $2, $3) returning id, player_id_1, player_id_2, created_at`
-	err := c.db.QueryRow(ctx, sqlStatement, game.ID, game.PlayerID1, game.PlayerID2, game.CreatedAt).Scan(game)
+	sqlStatement := `INSERT INTO games (player_id_1, player_id_2, created_at) VALUES ($1, $2, $3) returning id`
+	var id int
+	err := c.db.QueryRow(ctx, sqlStatement, game.PlayerID1, game.PlayerID2, game.CreatedAt).Scan(&id)
 	if err != nil {
 		return err
 	}
 
+	game.ID = fmt.Sprintf("%d", id)
 	return nil
 }
 

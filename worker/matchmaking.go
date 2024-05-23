@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -22,9 +23,16 @@ func (m *Matchmaker) Run() {
 	m.Logger.Info("matchmaking worker is now running...")
 	ctx := context.Background()
 	for {
+		m.Logger.Info("matchmaking worker ticks...")
 		time.Sleep(5 * time.Second)
-		if err := m.Service.FindMatch(ctx); err != nil {
+		res, err := m.Service.FindMatch(ctx)
+		if err != nil {
 			m.Logger.ErrorContext(ctx, err.Error())
+		}
+
+		for _, game := range res {
+			fmt.Println("tell player", game.PlayerID1, "has game", game.ID)
+			fmt.Println("tell player", game.PlayerID2, "has game", game.ID)
 		}
 	}
 }

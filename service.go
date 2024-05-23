@@ -38,7 +38,7 @@ func (s *Service) QueuePlayer(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *Service) FindMatch(ctx context.Context) error {
+func (s *Service) FindMatch(ctx context.Context) ([]Game, error) {
 	players := make([]string, 0, len(s.queue))
 	for k := range s.queue {
 		players = append(players, k)
@@ -55,16 +55,21 @@ func (s *Service) FindMatch(ctx context.Context) error {
 		pairs = append(pairs, [2]string{players[x], players[x+1]})
 	}
 
+	var games []Game
 	for _, pair := range pairs {
 		g := Game{
 			PlayerID1: pair[0],
 			PlayerID2: pair[1],
 		}
 		if err := s.CreateGame(ctx, &g); err != nil {
-			return err
+			return nil, err
 		}
+
+		delete(s.queue, pair[0])
+		delete(s.queue, pair[1])
+		games = append(games, g)
 	}
-	return nil
+	return games, nil
 }
 
 // ListGames returns a list of games
@@ -89,13 +94,13 @@ func (s *Service) ListGames(ctx context.Context, playerID string) ([]Game, error
 
 // CreateGame creates a game and returns the game details
 func (s *Service) CreateGame(ctx context.Context, game *Game) error {
-	s.logger.InfoContext(ctx, "create game")
 	game.CreatedAt = time.Now()
 	err := s.repo.CreateGame(ctx, game)
 	if err != nil {
 		return fmt.Errorf("could not create game: %s", err)
 	}
 
+	s.logger.InfoContext(ctx, "create game", "game", game)
 	return nil
 }
 
@@ -115,7 +120,7 @@ func (s *Service) GetGame(ctx context.Context, id string) (*Game, error) {
 }
 
 // Cast updates player_cast and returns game details
-func (s *Service) Cast(ctx context.Context, playerID string) (*Game, error) {
+func (s *Service) Cast(ctx context.Context, throw, playerID string) (*Game, error) {
 	s.logger.InfoContext(ctx, "cast vote", "id", playerID)
 
 	//get game by id
@@ -124,7 +129,6 @@ func (s *Service) Cast(ctx context.Context, playerID string) (*Game, error) {
 		return nil, err
 	}
 	var playerN string
-	var throw string
 	if game.Winner == game.PlayerID1 {
 		playerN = "player_cast_1"
 		throw = game.PlayerCast1

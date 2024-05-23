@@ -14,7 +14,7 @@ func FindMatch(s service) http.HandlerFunc {
 		}
 
 		if err := s.QueuePlayer(r.Context(), playerID); err != nil {
-			encodeJSONError(w, errors.New("error adding player to queue"), http.StatusInternalServerError)
+			encodeJSONError(w, err, http.StatusInternalServerError)
 			return
 		}
 

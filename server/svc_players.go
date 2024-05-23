@@ -33,12 +33,13 @@ func PostPlayer(s service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var player rockpapershit.Player
 		if err := decodeJSONReq(r, &player); err != nil {
-			encodeJSONResp(w, err, http.StatusBadRequest)
+			encodeJSONError(w, err, http.StatusBadRequest)
 			return
 		}
 
+		player.Ranking = 100
 		if err := s.CreatePlayer(r.Context(), &player); err != nil {
-			encodeJSONResp(w, err, http.StatusBadRequest)
+			encodeJSONError(w, err, http.StatusBadRequest)
 			return
 		}
 
