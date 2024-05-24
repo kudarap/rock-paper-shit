@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -18,6 +19,7 @@ func (c *Client) CreateGame(ctx context.Context, game *rockpapershit.Game) error
 	}
 
 	game.ID = fmt.Sprintf("%d", id)
+	fmt.Println("game", game)
 	return nil
 }
 
@@ -57,11 +59,14 @@ func (c *Client) Games(ctx context.Context, playerID string) ([]rockpapershit.Ga
 }
 
 func (c *Client) Game(ctx context.Context, id string) (*rockpapershit.Game, error) {
+	var cast1 sql.NullString
+	var cast2 sql.NullString
+
 	var game rockpapershit.Game
 	game.ID = id
 	err := c.db.
 		QueryRow(ctx, `SELECT id, player_id_1, player_id_2, player_cast_1, player_cast_2, created_at FROM games WHERE id=$1`, id).
-		Scan(&game.ID, &game.PlayerID1, &game.PlayerID2, &game.PlayerCast1, &game.PlayerCast2, &game.CreatedAt)
+		Scan(&game.ID, &game.PlayerID1, &game.PlayerID2, &cast1, &cast2, &game.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, rockpapershit.ErrNotFound
@@ -69,6 +74,8 @@ func (c *Client) Game(ctx context.Context, id string) (*rockpapershit.Game, erro
 		return nil, err
 	}
 
+	game.PlayerCast1 = cast1.String
+	game.PlayerCast2 = cast2.String
 	return &game, nil
 }
 

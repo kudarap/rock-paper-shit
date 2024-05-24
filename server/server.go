@@ -11,13 +11,14 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/kudarap/rockpapershit"
 )
 
 // Server represents application server.
 type Server struct {
 	*http.Server
 
-	service         service
+	service         *rockpapershit.Service
 	authenticator   authenticator
 	databaseChecker databaseChecker
 	tracing         tracing
@@ -30,7 +31,7 @@ type Server struct {
 // New creates new instance of Server.
 func New(
 	config Config,
-	service service,
+	service *rockpapershit.Service,
 	authenticator authenticator,
 	databaseChecker databaseChecker,
 	tracing tracing,
@@ -67,35 +68,32 @@ func New(
 // Routes setups middlewares and route endpoints.
 func (s *Server) Routes() http.Handler {
 	r := chi.NewRouter()
-	r.Use(
-		s.tracing.Middleware(),
-		requestIDMiddleware,
-		cors.Handler(cors.Options{}),
-		s.loggingMiddleware,
-		s.recoveryMiddleware,
-	)
-
-	// Public endpoints
-	r.Get("/version", GetVersion(s.Version))
-	r.Get("/healthcheck", HealthCheck(s.databaseChecker))
-	r.Get("/fighters/{id}", GetFighterByID(s.service))
-
-	// Demo endpoints
-	r.Get("/players/{id}", GetPlayerByID(s.service))
-	r.Post("/players", PostPlayer(s.service))
-	r.Get("/players", ListPlayers(s.service))
-
-	r.Get("/games/{id}", JoinGame(s.service))
-	r.Get("/games", ListGames(s.service))
-	r.Get("/currentgame", CurrentGame(s.service))
-
-	r.Post("/cast", Cast(s.service))
-	r.Get("/ws/findmatch", FindMatch(s.service))
-
-	// Private endpoints
+	r.Get("/ws/findmatch", FindMatchWs(s.service))
 	r.Route("/", func(r chi.Router) {
-		r.Use(authMiddleware(s.authenticator))
-		r.Get("/fighters", ListFighters(s.service))
+		r.Use(
+			s.tracing.Middleware(),
+			requestIDMiddleware,
+			cors.Handler(cors.Options{}),
+			s.loggingMiddleware,
+			s.recoveryMiddleware,
+		)
+
+		// Public endpoints
+		r.Get("/version", GetVersion(s.Version))
+		r.Get("/healthcheck", HealthCheck(s.databaseChecker))
+		r.Get("/fighters/{id}", GetFighterByID(s.service))
+
+		// Demo endpoints
+		r.Get("/players/{id}", GetPlayerByID(s.service))
+		r.Post("/players", PostPlayer(s.service))
+		r.Get("/players", ListPlayers(s.service))
+
+		r.Get("/games/{id}", JoinGame(s.service))
+		r.Get("/games", ListGames(s.service))
+		r.Get("/currentgame", CurrentGame(s.service))
+
+		r.Post("/cast", Cast(s.service))
+
 	})
 
 	r.NotFound(noMatchHandler(http.StatusNotFound))

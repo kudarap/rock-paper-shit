@@ -1,6 +1,7 @@
 import idgen from './idgen.js'
 import api from './api.js'
 import local from './local.js'
+import { connectSocket } from './ws.js'
 
 function main() {
     let playerID = local.getPlayer()
@@ -14,7 +15,7 @@ function main() {
             document.getElementById('player_text_ranking').innerText = player.ranking
             local.setPlayer(player.id)
         }).catch(e => {
-            alert('Ooops! curse of demos :)')
+            alert('Ooops! curse of demos 1:)')
             console.error(e.message)
         })
         return
@@ -24,15 +25,19 @@ function main() {
         console.log(player)
         document.getElementById('player_text_id').innerText = player.id
         document.getElementById('player_text_ranking').innerText = player.ranking
+
+        // connectSocket(playerID)
     }).catch(e => {
-        alert('Ooops! curse of demos :)')
+        alert('Ooops! curse of demos 2:)')
         console.error(e.message)
     })
 }
 
 main()
 
-// emulate 
-// setTimeout(() => {
-//     window.location = '/game#912j0921ke09jk'
-// }, 3000)
+const findMatch = document.getElementById('find_match')
+findMatch.addEventListener('click', () => {
+    const playerID = local.getPlayer()
+    findMatch.innerText = 'Finding...'
+    connectSocket(playerID)
+})

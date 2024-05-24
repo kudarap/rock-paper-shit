@@ -1,5 +1,6 @@
 import api from './api.js'
 import local from './local.js'
+import { connectSocket } from './ws.js'
 
 const TIME_LIMIT_SEC = 5;
 const SECONDS = 1000;
@@ -37,11 +38,11 @@ const SECONDS = 1000;
             you = player
             enemy = { id: game.player_id_1 }
         }
-        
+       
         const ticker = setInterval(() => {
-            const d = (new Date()) - Date.parse(game.created_at);
-            const t = TIME_LIMIT_SEC - Math.round(d/SECONDS)
-            if (t < 0) {
+            const d = (Date.parse(game.created_at) + TIME_LIMIT_SEC * SECONDS) - (new Date()).getTime();
+            const t = Math.round(d / SECONDS)
+            if (t < 1) {
                 clearInterval(ticker)
 
                 disableCastBtn()
@@ -142,3 +143,11 @@ function disableCastBtn() {
     castPaperBtn.setAttribute('disabled', 'disabled');
     castShitBtn.setAttribute('disabled', 'disabled');
 }
+
+export const findMatch = document.getElementById('find_match')
+findMatch.addEventListener('click', () => {
+    const playerID = local.getPlayer()
+    findMatch.innerText = 'Finding...'
+    connectSocket(playerID)
+})
+

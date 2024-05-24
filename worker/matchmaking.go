@@ -13,6 +13,8 @@ import (
 	r "github.com/redis/go-redis/v9"
 )
 
+const mmTicker = 1000 * time.Millisecond
+
 type Matchmaker struct {
 	Redis   *redis.Client
 	Service *rockpapershit.Service // game service
@@ -24,7 +26,7 @@ func (m *Matchmaker) Run() {
 	ctx := context.Background()
 	for {
 		m.Logger.Info("matchmaking worker ticks...")
-		time.Sleep(5 * time.Second)
+		time.Sleep(mmTicker)
 		res, err := m.Service.FindMatch(ctx)
 		if err != nil {
 			m.Logger.ErrorContext(ctx, err.Error())

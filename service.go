@@ -22,11 +22,13 @@ type Service struct {
 	logger *slog.Logger
 
 	queue map[string]int
+
+	NotifQ chan string
 }
 
 // NewService returns new foo service.
 func NewService(r repository, c cache, redis *redis.Client, l *slog.Logger) *Service {
-	return &Service{repo: r, cache: c, redis: redis, logger: l, queue: make(map[string]int)}
+	return &Service{repo: r, cache: c, redis: redis, logger: l, queue: make(map[string]int), NotifQ: make(chan string, 100)}
 }
 
 func (s *Service) QueuePlayer(ctx context.Context, id string) error {
@@ -66,10 +68,24 @@ func (s *Service) FindMatch(ctx context.Context) ([]Game, error) {
 		}
 
 		delete(s.queue, pair[0])
+		s.NotifQ <- fmt.Sprintf("%s.%s", g.ID, pair[0])
 		delete(s.queue, pair[1])
+		s.NotifQ <- fmt.Sprintf("%s.%s", g.ID, pair[1])
+
 		games = append(games, g)
 	}
 	return games, nil
+}
+
+func (s *Service) Notify(ctx context.Context) string {
+	for {
+		select {
+		case msg := <-s.NotifQ:
+			return msg
+		default:
+			return ""
+		}
+	}
 }
 
 // ListGames returns a list of games
@@ -116,6 +132,7 @@ func (s *Service) GetGame(ctx context.Context, id string) (*Game, error) {
 		return nil, fmt.Errorf("could not find game on repository: %s", err)
 	}
 	g1 := g.setResult()
+	//g1.CreatedAt = g1.CreatedAt.Local()
 	return &g1, nil
 }
 

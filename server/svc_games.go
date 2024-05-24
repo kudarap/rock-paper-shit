@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kudarap/rockpapershit"
@@ -13,7 +14,9 @@ func JoinGame(s service) http.HandlerFunc {
 		game, err := s.GetGame(r.Context(), id)
 		if err != nil {
 			encodeJSONError(w, err, http.StatusBadRequest)
+			return
 		}
+		game.CreatedAt = time.Now()
 		encodeJSONResp(w, game, http.StatusOK)
 	}
 }
