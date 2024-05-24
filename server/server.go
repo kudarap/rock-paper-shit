@@ -92,7 +92,7 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/games", ListGames(s.service))
 		r.Get("/currentgame", CurrentGame(s.service))
 
-		r.Post("/cast", Cast(s.service))
+		r.Post("/castgames/{id}", Cast(s.service))
 
 	})
 

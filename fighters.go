@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	ErrFighterNotFound = xerror.Error("not_found")
-	ErrNotFound        = xerror.Error("not_found")
+	ErrFighterNotFound = xerror.Error("not_found_fighter")
+	ErrNotFound        = xerror.Error("not_found_generic")
 )
 
 type Fighter struct {

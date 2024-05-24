@@ -88,7 +88,60 @@ const SECONDS = 1000;
         return
     }
 
-    // render
+    const castRockBtn = document.getElementById('cast_rock')
+    const castPaperBtn = document.getElementById('cast_paper')
+    const castShitBtn = document.getElementById('cast_shit')
+
+    castRockBtn.addEventListener('click', () => {
+        highlightBtn(castRockBtn)
+        castPaperBtn.parentElement.remove()
+        castShitBtn.parentElement.remove()
+
+        api.castGame(gameID, playerID, 'rock').then(() => {
+            castRockBtn.style.borderColor = 'grey'
+        }).catch(() => {
+            alert('Ooops! curse of demos :)')
+            console.error(e.message)
+        })
+    })
+    castPaperBtn.addEventListener('click', () => {
+        highlightBtn(castPaperBtn)
+        castRockBtn.parentElement.remove()
+        castShitBtn.parentElement.remove()
+
+        api.castGame(gameID, playerID, 'paper').then(() => {
+            castRockBtn.style.borderColor = 'grey'
+        }).catch(() => {
+            alert('Ooops! curse of demos :)')
+            console.error(e.message)
+        })
+    })
+    castShitBtn.addEventListener('click', () => {
+        highlightBtn(castShitBtn)
+        castPaperBtn.parentElement.remove()
+        castRockBtn.parentElement.remove()
+
+        api.castGame(gameID, playerID, 'shit').then(() => {
+            castRockBtn.style.borderColor = 'grey'
+        }).catch(() => {
+            alert('Ooops! curse of demos :)')
+            console.error(e.message)
+        })
+    })
+
+    function highlightBtn(el) {
+        el.style.backgroundColor = 'lightYellow';
+        el.style.border = '1px solid orange';
+        el.style.borderRadius = '10px';
+    }
+
+    function disableCastBtn() {
+        castRockBtn.setAttribute('disabled', 'disabled');
+        castPaperBtn.setAttribute('disabled', 'disabled');
+        castShitBtn.setAttribute('disabled', 'disabled');
+    }
+
+     // render
     console.log({
         game,
         player,
@@ -101,7 +154,6 @@ const SECONDS = 1000;
     document.getElementById('player2_text_ranking').innerHTML = enemy.ranking+'<small>mmr</small>'
 })()
 
-
 function evalResult(you, game) {
     if (game.is_draw || game.winner == '') {
         return '<span style="color: grey;">DRAW!</span>'
@@ -112,37 +164,6 @@ function evalResult(you, game) {
     return '<span style="color: crimson;">YOU LOSE!</span>'
 }
 
-const castRockBtn = document.getElementById('cast_rock')
-const castPaperBtn = document.getElementById('cast_paper')
-const castShitBtn = document.getElementById('cast_shit')
-
-castRockBtn.addEventListener('click', () => {
-    highlightBtn(castRockBtn)
-    castPaperBtn.parentElement.remove()
-    castShitBtn.parentElement.remove()
-})
-castPaperBtn.addEventListener('click', () => {
-    highlightBtn(castPaperBtn)
-    castRockBtn.parentElement.remove()
-    castShitBtn.parentElement.remove()
-})
-castShitBtn.addEventListener('click', () => {
-    highlightBtn(castShitBtn)
-    castPaperBtn.parentElement.remove()
-    castRockBtn.parentElement.remove()
-})
-
-function highlightBtn(el) {
-    el.style.backgroundColor = 'lightYellow';
-    el.style.border = '1px solid orange';
-    el.style.borderRadius = '10px';
-}
-
-function disableCastBtn() {
-    castRockBtn.setAttribute('disabled', 'disabled');
-    castPaperBtn.setAttribute('disabled', 'disabled');
-    castShitBtn.setAttribute('disabled', 'disabled');
-}
 
 export const findMatch = document.getElementById('find_match')
 findMatch.addEventListener('click', () => {
@@ -150,4 +171,3 @@ findMatch.addEventListener('click', () => {
     findMatch.innerText = 'Finding...'
     connectSocket(playerID)
 })
-

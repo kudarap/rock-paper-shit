@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/kudarap/rockpapershit"
@@ -59,6 +60,7 @@ func (c *Client) Games(ctx context.Context, playerID string) ([]rockpapershit.Ga
 }
 
 func (c *Client) Game(ctx context.Context, id string) (*rockpapershit.Game, error) {
+	fmt.Println("GameGameGameGame", id)
 	var cast1 sql.NullString
 	var cast2 sql.NullString
 
@@ -80,12 +82,32 @@ func (c *Client) Game(ctx context.Context, id string) (*rockpapershit.Game, erro
 }
 
 func (c *Client) Cast(ctx context.Context, throw, playerN, gameID string) (*rockpapershit.Game, error) {
-	sqlStatement := fmt.Sprintf(`Update games SET %s = $1 where id = $2`, playerN)
+	fmt.Println("repo Cast", throw, playerN, gameID)
 
-	var createdGame rockpapershit.Game
-	err := c.db.QueryRow(ctx, sqlStatement, throw, gameID).Scan(&createdGame)
+	idn, err := strconv.Atoi(gameID)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+
+	sqlStatement := fmt.Sprintf(`Update games SET %s = $1 where id = $2 RETURNING id, player_id_1, player_id_2, player_cast_1, player_cast_2, created_at`, playerN)
+	fmt.Println("CAST", sqlStatement, idn)
+
+	var cast1 sql.NullString
+	var cast2 sql.NullString
+	var createdGame rockpapershit.Game
+	err = c.db.QueryRow(ctx, sqlStatement, throw, idn).Scan(
+		&createdGame.ID,
+		&createdGame.PlayerID1,
+		&createdGame.PlayerID2,
+		&cast1,
+		&cast2,
+		&createdGame.CreatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("cast query row: %s", err)
+	}
+
+	createdGame.PlayerCast1 = cast1.String
+	createdGame.PlayerCast2 = cast2.String
+	return &createdGame, nil
 }

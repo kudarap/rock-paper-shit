@@ -127,7 +127,7 @@ func (s *Service) GetGame(ctx context.Context, id string) (*Game, error) {
 	g, err := s.repo.Game(ctx, id)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
-			return nil, ErrNotFound.X(err)
+			return nil, fmt.Errorf("could not get game by id: %s", err)
 		}
 		return nil, fmt.Errorf("could not find game on repository: %s", err)
 	}
@@ -137,21 +137,22 @@ func (s *Service) GetGame(ctx context.Context, id string) (*Game, error) {
 }
 
 // Cast updates player_cast and returns game details
-func (s *Service) Cast(ctx context.Context, throw, playerID string) (*Game, error) {
+func (s *Service) Cast(ctx context.Context, throw, gameID, playerID string) (*Game, error) {
+	fmt.Println("svc Cast", throw, playerID, gameID)
+
 	s.logger.InfoContext(ctx, "cast vote", "id", playerID)
 
-	//get game by id
-	game, err := s.GetGame(ctx, playerID)
+	// get game by id
+	game, err := s.GetGame(ctx, gameID)
 	if err != nil {
 		return nil, err
 	}
+
 	var playerN string
-	if game.Winner == game.PlayerID1 {
+	if game.PlayerID1 == playerID {
 		playerN = "player_cast_1"
-		throw = game.PlayerCast1
 	} else {
 		playerN = "player_cast_2"
-		throw = game.PlayerCast2
 	}
 
 	game, err = s.repo.Cast(ctx, throw, playerN, game.ID)

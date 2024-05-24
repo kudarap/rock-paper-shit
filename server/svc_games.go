@@ -34,13 +34,22 @@ func ListGames(s service) http.HandlerFunc {
 
 func Cast(s service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		params := struct {
+			PlayerID string `json:"player_id"`
+			Throw    string `json:"throw"`
+		}{}
+		if err := decodeJSONReq(r, &params); err != nil {
+			encodeJSONError(w, err, http.StatusBadRequest)
+			return
+		}
+
 		gameID := chi.URLParam(r, "id")
-		games, err := s.Cast(r.Context(), "rock", gameID)
+		game, err := s.Cast(r.Context(), params.Throw, gameID, params.PlayerID)
 		if err != nil {
 			encodeJSONError(w, err, http.StatusBadRequest)
 			return
 		}
-		encodeJSONResp(w, games, http.StatusOK)
+		encodeJSONResp(w, game, http.StatusOK)
 		return
 	}
 }

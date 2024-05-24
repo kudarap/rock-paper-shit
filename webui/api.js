@@ -34,11 +34,22 @@ async function getGame(gameID) {
     return await res.json();
 }
 
-async function cast()
+async function castGame(gameID, playerID, cast) {
+    const res = await fetch(API_URL + '/castgames/' + gameID, {
+        method: 'POST',
+        ...apiOpts,
+        body: JSON.stringify({
+            player_id: playerID,
+            throw: cast,
+        }),
+    });
+    return await res.json();
+}
 
 export default {
     API_URL,
     createPlayer,
     getPlayer,
     getGame,
+    castGame,
 }
