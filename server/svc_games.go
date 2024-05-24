@@ -34,8 +34,8 @@ func ListGames(s service) http.HandlerFunc {
 
 func Cast(s service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		games, err := s.Cast(r.Context(), "rock", id)
+		gameID := chi.URLParam(r, "id")
+		games, err := s.Cast(r.Context(), "rock", gameID)
 		if err != nil {
 			encodeJSONError(w, err, http.StatusBadRequest)
 			return

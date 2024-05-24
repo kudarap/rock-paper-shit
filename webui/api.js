@@ -1,3 +1,4 @@
+// const API_URL = 'http://192.168.9.239:8000'
 const API_URL = 'http://localhost:8000'
 
 const apiOpts = {
@@ -33,8 +34,10 @@ async function getGame(gameID) {
     return await res.json();
 }
 
+async function cast()
 
 export default {
+    API_URL,
     createPlayer,
     getPlayer,
     getGame,
